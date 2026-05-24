@@ -9,8 +9,10 @@ import {
   diagnoseSingle,
   CODECO,
   COPRAR,
+  IFTSTA,
+  COREOR,
 } from "../src/schemas.js";
-import { SAMPLE_CODECO, SAMPLE_COPRAR } from "../src/samples.js";
+import { SAMPLE_CODECO, SAMPLE_COPRAR, SAMPLE_IFTSTA, SAMPLE_COREOR } from "../src/samples.js";
 
 describe("validateCheckDigit", () => {
   it("accepts a known-good ISO 6346 number", () => {
@@ -66,7 +68,7 @@ describe("detectMessageType", () => {
   });
 
   it("returns null for unknown messages", () => {
-    const r = parse("UNH+1+IFTSTA:D:00B:UN:SMDG10'");
+    const r = parse("UNH+1+BAPLIE:D:00B:UN:SMDG30'");
     expect(detectMessageType(r)).toBeNull();
   });
 });
@@ -159,5 +161,125 @@ describe("schema exports", () => {
   it("exposes COPRAR schema metadata", () => {
     expect(COPRAR.name).toBe("COPRAR");
     expect(COPRAR.bgmCodes).toContain("45");
+  });
+
+  it("exposes IFTSTA schema metadata", () => {
+    expect(IFTSTA.name).toBe("IFTSTA");
+    expect(IFTSTA.bgmCodes).toContain("23");
+  });
+
+  it("exposes COREOR schema metadata", () => {
+    expect(COREOR.name).toBe("COREOR");
+    expect(COREOR.bgmCodes).toContain("12");
+  });
+});
+
+describe("IFTSTA detection + diagnostics", () => {
+  it("detects IFTSTA from UNH header", () => {
+    const r = parse(SAMPLE_IFTSTA);
+    expect(detectMessageType(r)).toBe("IFTSTA");
+  });
+
+  it("detects IFTSTA from BGM 23 when UNH is absent", () => {
+    const r = parse("BGM+23+REF+9'");
+    expect(detectMessageType(r)).toBe("IFTSTA");
+  });
+
+  it("parses the SMDG IFTSTA sample cleanly (no errors)", () => {
+    const r = parse(SAMPLE_IFTSTA);
+    const diags = diagnoseSingle(r);
+    const errors = diags.filter((d) => d.level === "error");
+    expect(errors).toEqual([]);
+  });
+
+  it("fires MISSING_CNI when no CNI present", () => {
+    const broken = SAMPLE_IFTSTA.replace(/CNI\+1\+MSCUNLRTM0042:BM'\n/, "");
+    const r = parse(broken);
+    const diags = diagnoseSingle(r);
+    expect(diags.some((d) => d.code === "MISSING_CNI")).toBe(true);
+  });
+
+  it("fires MISSING_STS_DTM when an STS lacks a timestamp", () => {
+    // Remove the DTM+334 line that follows the first STS
+    const broken = SAMPLE_IFTSTA.replace("DTM+334:202605241455:203'\n", "");
+    const r = parse(broken);
+    const diags = diagnoseSingle(r);
+    expect(diags.some((d) => d.code === "MISSING_STS_DTM")).toBe(true);
+  });
+
+  it("decodes STS detail code 29 as gate-out", () => {
+    expect(lookup("STS.detail", "29")).toContain("Gate-out");
+  });
+
+  it("decodes STS qualifier 1 as equipment status", () => {
+    expect(lookup("STS.qualifier", "1")).toContain("Equipment");
+  });
+});
+
+describe("COREOR detection + diagnostics", () => {
+  it("detects COREOR from UNH header", () => {
+    const r = parse(SAMPLE_COREOR);
+    expect(detectMessageType(r)).toBe("COREOR");
+  });
+
+  it("detects COREOR from BGM 12 when UNH is absent", () => {
+    const r = parse("BGM+12+REF+9'");
+    expect(detectMessageType(r)).toBe("COREOR");
+  });
+
+  it("parses the SMDG COREOR sample cleanly (no errors)", () => {
+    const r = parse(SAMPLE_COREOR);
+    const diags = diagnoseSingle(r);
+    const errors = diags.filter((d) => d.level === "error");
+    expect(errors).toEqual([]);
+  });
+
+  it("fires MISSING_AAY when no release ref present", () => {
+    const broken = SAMPLE_COREOR.replace(/RFF\+AAY:[^']+'\n/, "");
+    const r = parse(broken);
+    const diags = diagnoseSingle(r);
+    expect(diags.some((d) => d.code === "MISSING_AAY")).toBe(true);
+  });
+
+  it("fires MULTIPLE_AAY when more than one release ref present", () => {
+    const broken = SAMPLE_COREOR.replace(
+      "RFF+AAY:REL-MSCU-NYC-2026-00042'",
+      "RFF+AAY:REL-MSCU-NYC-2026-00042'\nRFF+AAY:REL-MSCU-NYC-2026-00043'",
+    );
+    const r = parse(broken);
+    const diags = diagnoseSingle(r);
+    expect(diags.some((d) => d.code === "MULTIPLE_AAY")).toBe(true);
+  });
+
+  it("fires RELEASE_WITHOUT_ADDRESSEE when neither CN nor BO present", () => {
+    const broken = SAMPLE_COREOR.replace(/NAD\+CN\+[^']+'\n/, "").replace(/NAD\+BO\+[^']+'\n/, "");
+    const r = parse(broken);
+    const diags = diagnoseSingle(r);
+    expect(diags.some((d) => d.code === "RELEASE_WITHOUT_ADDRESSEE")).toBe(true);
+  });
+
+  it("fires EXPIRED_RELEASE on a past DTM+36 expiration", () => {
+    const broken = SAMPLE_COREOR.replace("DTM+36:202606101200:203", "DTM+36:202001011200:203");
+    const r = parse(broken);
+    const diags = diagnoseSingle(r);
+    expect(diags.some((d) => d.code === "EXPIRED_RELEASE")).toBe(true);
+  });
+
+  it("fires EMPTY_ON_IMPORT_RELEASE when BGM 12 has empty container", () => {
+    // EQD position 5 (sixth element) is full/empty indicator. Replace
+    // the +4 at position 5 with +5 (empty). The EQD in the sample is:
+    // EQD+CN+MSCU1234566+45G1:102:5++4+4
+    // We change the second '4' (the full-empty indicator at index 5) to '5'.
+    const broken = SAMPLE_COREOR.replace(
+      "EQD+CN+MSCU1234566+45G1:102:5++4+4",
+      "EQD+CN+MSCU1234566+45G1:102:5++4+5",
+    );
+    const r = parse(broken);
+    const diags = diagnoseSingle(r);
+    expect(diags.some((d) => d.code === "EMPTY_ON_IMPORT_RELEASE")).toBe(true);
+  });
+
+  it("decodes BGM doc code 12 as Container release order", () => {
+    expect(lookup("BGM.docname", "12")).toContain("release");
   });
 });

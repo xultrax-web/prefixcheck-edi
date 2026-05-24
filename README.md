@@ -1,6 +1,6 @@
 # @prefixcheck/edi
 
-Operator-grade EDIFACT **CODECO** + **COPRAR** decoder, **SMDG-aware** validator, and **cross-message reconciler** for container-shipping operations. Pure TypeScript, zero dependencies, browser- and Node-friendly.
+Operator-grade EDIFACT decoder for the container-shipping operator stack: **CODECO**, **COPRAR**, **IFTSTA**, **COREOR**. **SMDG-aware** validation, ISO 6346 check-digit verification, UN/LOCODE extraction, and COPRAR ↔ CODECO **cross-message reconciliation**. Pure TypeScript, zero dependencies, browser- and Node-friendly.
 
 ```bash
 npm install @prefixcheck/edi
@@ -192,7 +192,7 @@ The companion in-browser decoder lives at [prefixcheck.com/container-edi/](https
 - **Send or receive messages.** This is a read-side library. It does not transmit, queue, or talk to any EDI VAN or carrier network.
 - **Generate messages from scratch.** Decoding is one direction. Building a CODECO or COPRAR for transmission still needs the terminal operating system (Navis, CATOS, RBS) or an EDI authoring tool.
 - **Persist or aggregate.** Each call to `parse()` is stateless. The library has no storage layer.
-- **Cover every EDIFACT message type.** Scope is CODECO + COPRAR. Other container-shipping messages (BAPLIE, IFTSTA, IFTMIN, COREOR, COARRI, VERMAS, COPARN) are not implemented in this release.
+- **Cover every EDIFACT message type.** Scope is CODECO + COPRAR + IFTSTA + COREOR. Other container-shipping messages (BAPLIE, IFTMIN, COARRI, VERMAS, COPARN) are not implemented in this release.
 
 ---
 

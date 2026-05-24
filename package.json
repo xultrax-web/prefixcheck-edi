@@ -1,7 +1,7 @@
 {
   "name": "@prefixcheck/edi",
-  "version": "0.1.0",
-  "description": "Operator-grade EDIFACT CODECO + COPRAR decoder with SMDG validation, ISO 6346 check-digit verification, UN/LOCODE cross-reference, and cross-message reconciliation. Pure TypeScript, zero dependencies, browser- and Node-friendly.",
+  "version": "0.2.0",
+  "description": "Operator-grade EDIFACT decoder for the container-shipping operator stack: CODECO, COPRAR, IFTSTA, COREOR. SMDG-aware validation, ISO 6346 check-digit verification, UN/LOCODE cross-reference, COPRAR ↔ CODECO reconciliation. Pure TypeScript, zero dependencies, browser- and Node-friendly.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

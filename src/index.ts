@@ -36,12 +36,14 @@ export {
   reconcile,
   CODECO,
   COPRAR,
+  IFTSTA,
+  COREOR,
   SEGMENTS,
   CODE_LISTS,
   type SegmentInfo,
 } from "./schemas.js";
 
-export { SAMPLE_CODECO, SAMPLE_COPRAR } from "./samples.js";
+export { SAMPLE_CODECO, SAMPLE_COPRAR, SAMPLE_IFTSTA, SAMPLE_COREOR } from "./samples.js";
 
 export type {
   Delimiters,
