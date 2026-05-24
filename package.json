@@ -1,0 +1,83 @@
+{
+  "name": "@prefixcheck/edi",
+  "version": "0.1.0",
+  "description": "Operator-grade EDIFACT CODECO + COPRAR decoder with SMDG validation, ISO 6346 check-digit verification, UN/LOCODE cross-reference, and cross-message reconciliation. Pure TypeScript, zero dependencies, browser- and Node-friendly.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./parser": {
+      "import": "./dist/parser.js",
+      "types": "./dist/parser.d.ts"
+    },
+    "./schemas": {
+      "import": "./dist/schemas.js",
+      "types": "./dist/schemas.d.ts"
+    },
+    "./samples": {
+      "import": "./dist/samples.js",
+      "types": "./dist/samples.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "keywords": [
+    "edifact",
+    "edi",
+    "codeco",
+    "coprar",
+    "smdg",
+    "container",
+    "shipping",
+    "iso6346",
+    "iso-6346",
+    "container-shipping",
+    "freight",
+    "logistics",
+    "depot",
+    "terminal",
+    "vgm",
+    "un-locode",
+    "unlocode",
+    "decoder",
+    "parser",
+    "validator"
+  ],
+  "homepage": "https://prefixcheck.com/container-edi/",
+  "bugs": {
+    "url": "https://github.com/xultrax-web/prefixcheck-edi/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xultrax-web/prefixcheck-edi.git"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "prettier": "^3.8.3",
+    "typescript": "^5.7.2",
+    "vitest": "^4.1.7"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
