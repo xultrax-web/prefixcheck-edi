@@ -45,7 +45,9 @@ describe("reconcile · field-level diffs", () => {
   it("flags gross-weight mismatch beyond 2% as warn", () => {
     const coprar = parse(SAMPLE_COPRAR);
     // CODECO sample has 28450 kg; bump it to 30000 kg = +5.4%
-    const codecoModified = parse(SAMPLE_CODECO.replace("MEA+AAE+AET+KGM:28450", "MEA+AAE+AET+KGM:30000"));
+    const codecoModified = parse(
+      SAMPLE_CODECO.replace("MEA+AAE+AET+KGM:28450", "MEA+AAE+AET+KGM:30000"),
+    );
     const r = reconcile(coprar, codecoModified);
     const matched = r.matched.find((m) => m.number === "MSCU1234566");
     expect(matched?.diffs.some((d) => d.field === "Gross weight")).toBe(true);
@@ -54,7 +56,9 @@ describe("reconcile · field-level diffs", () => {
   it("does NOT flag gross-weight within 2% tolerance", () => {
     const coprar = parse(SAMPLE_COPRAR);
     // Bump by 1% (28450 → 28550 = +0.35%)
-    const codecoModified = parse(SAMPLE_CODECO.replace("MEA+AAE+AET+KGM:28450", "MEA+AAE+AET+KGM:28550"));
+    const codecoModified = parse(
+      SAMPLE_CODECO.replace("MEA+AAE+AET+KGM:28450", "MEA+AAE+AET+KGM:28550"),
+    );
     const r = reconcile(coprar, codecoModified);
     const matched = r.matched.find((m) => m.number === "MSCU1234566");
     expect(matched?.diffs.some((d) => d.field === "Gross weight")).toBe(false);

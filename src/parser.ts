@@ -20,13 +20,7 @@
 // repetition, segment.
 // ============================================================
 
-import type {
-  Delimiters,
-  Interchange,
-  Message,
-  ParsedMessage,
-  Segment,
-} from "./types.js";
+import type { Delimiters, Interchange, Message, ParsedMessage, Segment } from "./types.js";
 
 export const DEFAULT_DELIMITERS: Delimiters = Object.freeze({
   element: "+",

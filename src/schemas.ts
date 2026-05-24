@@ -21,9 +21,32 @@ import type {
 
 // ── ISO 6346 check-digit (Mod-11 weighted-letter algorithm) ────
 const LETTER_VALUES: Record<string, number> = {
-  A: 10, B: 12, C: 13, D: 14, E: 15, F: 16, G: 17, H: 18, I: 19, J: 20,
-  K: 21, L: 23, M: 24, N: 25, O: 26, P: 27, Q: 28, R: 29, S: 30, T: 31,
-  U: 32, V: 34, W: 35, X: 36, Y: 37, Z: 38,
+  A: 10,
+  B: 12,
+  C: 13,
+  D: 14,
+  E: 15,
+  F: 16,
+  G: 17,
+  H: 18,
+  I: 19,
+  J: 20,
+  K: 21,
+  L: 23,
+  M: 24,
+  N: 25,
+  O: 26,
+  P: 27,
+  Q: 28,
+  R: 29,
+  S: 30,
+  T: 31,
+  U: 32,
+  V: 34,
+  W: 35,
+  X: 36,
+  Y: 37,
+  Z: 38,
 };
 
 /**
@@ -38,7 +61,7 @@ export function validateCheckDigit(code: string): boolean {
     const v = i < 4 ? LETTER_VALUES[ch] : Number(ch);
     sum += v * (1 << i);
   }
-  return ((sum % 11) % 10) === Number(code[10]);
+  return (sum % 11) % 10 === Number(code[10]);
 }
 
 // ── Segment dictionary ────────────────────────────────────────
@@ -48,40 +71,120 @@ export interface SegmentInfo {
 }
 
 export const SEGMENTS: Record<string, SegmentInfo> = {
-  UNA: { name: "Service String Advice", brief: "Optional delimiter override at the start of an interchange." },
-  UNB: { name: "Interchange Header", brief: "Envelope · sender, recipient, control reference, syntax level." },
+  UNA: {
+    name: "Service String Advice",
+    brief: "Optional delimiter override at the start of an interchange.",
+  },
+  UNB: {
+    name: "Interchange Header",
+    brief: "Envelope · sender, recipient, control reference, syntax level.",
+  },
   UNZ: { name: "Interchange Trailer", brief: "Envelope close · message count + ref echo of UNB." },
-  UNH: { name: "Message Header", brief: "Message envelope open · message type + version + SMDG implementation tag." },
-  UNT: { name: "Message Trailer", brief: "Message envelope close · segment count + ref echo of UNH." },
-  BGM: { name: "Beginning of Message", brief: "Document type + reference number + function (original / replacement / change)." },
-  DTM: { name: "Date / Time / Period", brief: "Timestamps qualified by purpose (137 issue date, 132 ETA, 134 ATA, 178 actual gate, 798 stuffing)." },
-  LOC: { name: "Place / Location Identification", brief: "UN/LOCODE for ports, terminals, depots, plus stowage cell + next port of call." },
-  NAD: { name: "Name and Address", brief: "Parties to the message (CA carrier, CF container operator, TR terminal, CN consignee, CZ consignor)." },
+  UNH: {
+    name: "Message Header",
+    brief: "Message envelope open · message type + version + SMDG implementation tag.",
+  },
+  UNT: {
+    name: "Message Trailer",
+    brief: "Message envelope close · segment count + ref echo of UNH.",
+  },
+  BGM: {
+    name: "Beginning of Message",
+    brief: "Document type + reference number + function (original / replacement / change).",
+  },
+  DTM: {
+    name: "Date / Time / Period",
+    brief:
+      "Timestamps qualified by purpose (137 issue date, 132 ETA, 134 ATA, 178 actual gate, 798 stuffing).",
+  },
+  LOC: {
+    name: "Place / Location Identification",
+    brief: "UN/LOCODE for ports, terminals, depots, plus stowage cell + next port of call.",
+  },
+  NAD: {
+    name: "Name and Address",
+    brief:
+      "Parties to the message (CA carrier, CF container operator, TR terminal, CN consignee, CZ consignor).",
+  },
   CTA: { name: "Contact Information", brief: "Contact person within a NAD party." },
   COM: { name: "Communication Contact", brief: "Phone / email / fax for a CTA." },
-  RFF: { name: "Reference", brief: "External references — booking (BN), B/L (BM), equipment (EQ), release (AAY), voyage (VON)." },
-  EQD: { name: "Equipment Details", brief: "Container: type CN, BIC code, ISO size-type, supplier indicator, full/empty status." },
+  RFF: {
+    name: "Reference",
+    brief:
+      "External references — booking (BN), B/L (BM), equipment (EQ), release (AAY), voyage (VON).",
+  },
+  EQD: {
+    name: "Equipment Details",
+    brief: "Container: type CN, BIC code, ISO size-type, supplier indicator, full/empty status.",
+  },
   EQN: { name: "Number of Units", brief: "Number of equipment units in a group." },
-  EQA: { name: "Attached Equipment", brief: "Chassis (CH) or reefer gen-set (RG) attached to the container." },
-  TMD: { name: "Transport Movement Details", brief: "FCL / LCL movement type, transport service code." },
-  HAN: { name: "Handling Instructions", brief: "How the container should be handled (handle with care, keep upright, reefer pre-cool, etc.)." },
-  MEA: { name: "Measurements", brief: "Weights, dimensions, VGM — qualified (AAE gross, AAL tare, AAJ payload, VGM verified gross mass)." },
-  DIM: { name: "Dimensions", brief: "Out-of-gauge dimensions (over-length, over-height, over-width)." },
+  EQA: {
+    name: "Attached Equipment",
+    brief: "Chassis (CH) or reefer gen-set (RG) attached to the container.",
+  },
+  TMD: {
+    name: "Transport Movement Details",
+    brief: "FCL / LCL movement type, transport service code.",
+  },
+  HAN: {
+    name: "Handling Instructions",
+    brief:
+      "How the container should be handled (handle with care, keep upright, reefer pre-cool, etc.).",
+  },
+  MEA: {
+    name: "Measurements",
+    brief:
+      "Weights, dimensions, VGM — qualified (AAE gross, AAL tare, AAJ payload, VGM verified gross mass).",
+  },
+  DIM: {
+    name: "Dimensions",
+    brief: "Out-of-gauge dimensions (over-length, over-height, over-width).",
+  },
   TMP: { name: "Temperature", brief: "Reefer setpoint temperature." },
   RNG: { name: "Range Details", brief: "Reefer temperature range / acceptable variance." },
-  SEL: { name: "Seal Number", brief: "Container seal identifiers + applying party (CA carrier, SH shipper, TR terminal, CU customs)." },
-  FTX: { name: "Free Text", brief: "Operator-readable narrative qualified by purpose (AAA general, DAR damage, OSI other info, ABS condition)." },
-  DGS: { name: "Dangerous Goods", brief: "IMDG class, UN number, packing group, flashpoint — SOLAS-relevant." },
-  TDT: { name: "Details of Transport", brief: "Vessel name + voyage + IMO number + carrier (mode 1 sea, 2 rail, 3 road)." },
-  TPL: { name: "Transport Placement", brief: "Stowage cell on the vessel: 6-digit BBBRRTT (bay-row-tier)." },
-  DAM: { name: "Damage", brief: "Damage location + severity per SMDG JM4/272 (lifts ISO 9897 damage catalogue)." },
+  SEL: {
+    name: "Seal Number",
+    brief:
+      "Container seal identifiers + applying party (CA carrier, SH shipper, TR terminal, CU customs).",
+  },
+  FTX: {
+    name: "Free Text",
+    brief:
+      "Operator-readable narrative qualified by purpose (AAA general, DAR damage, OSI other info, ABS condition).",
+  },
+  DGS: {
+    name: "Dangerous Goods",
+    brief: "IMDG class, UN number, packing group, flashpoint — SOLAS-relevant.",
+  },
+  TDT: {
+    name: "Details of Transport",
+    brief: "Vessel name + voyage + IMO number + carrier (mode 1 sea, 2 rail, 3 road).",
+  },
+  TPL: {
+    name: "Transport Placement",
+    brief: "Stowage cell on the vessel: 6-digit BBBRRTT (bay-row-tier).",
+  },
+  DAM: {
+    name: "Damage",
+    brief: "Damage location + severity per SMDG JM4/272 (lifts ISO 9897 damage catalogue).",
+  },
   COD: { name: "Component Details", brief: "Component code + damage detail for DAM segment." },
-  DOC: { name: "Document / Message Details", brief: "Document reference (EIR ID, gate receipt no., survey no.)." },
+  DOC: {
+    name: "Document / Message Details",
+    brief: "Document reference (EIR ID, gate receipt no., survey no.).",
+  },
   GID: { name: "Goods Item Details", brief: "Description of goods inside the container." },
   GDS: { name: "Nature of Cargo", brief: "Cargo nature classification." },
   PIA: { name: "Additional Product Identification", brief: "Additional product identification." },
-  CNT: { name: "Control Total", brief: "CNT+16:n = number of equipment units. CNT+7:n = total TEU." },
-  STS: { name: "Status", brief: "Container event status (1 empty, 2 full/loaded, gate-in, gate-out, on-hire, off-hire, hold)." },
+  CNT: {
+    name: "Control Total",
+    brief: "CNT+16:n = number of equipment units. CNT+7:n = total TEU.",
+  },
+  STS: {
+    name: "Status",
+    brief:
+      "Container event status (1 empty, 2 full/loaded, gate-in, gate-out, on-hire, off-hire, hold).",
+  },
 };
 
 // ── Code lists ────────────────────────────────────────────────
@@ -347,15 +450,37 @@ export const CODE_LISTS: Record<string, CodeList> = {
  */
 export function decodeISOSizeType(code: string): string | null {
   if (!/^[A-Z0-9]{4}$/.test(code)) return null;
-  const sizeMap: Record<string, string> = { "1": "10ft", "2": "20ft", "3": "30ft", "4": "40ft", L: "45ft", M: "48ft", N: "49ft" };
+  const sizeMap: Record<string, string> = {
+    "1": "10ft",
+    "2": "20ft",
+    "3": "30ft",
+    "4": "40ft",
+    L: "45ft",
+    M: "48ft",
+    N: "49ft",
+  };
   const heightMap: Record<string, string> = {
-    "0": "8ft", "2": "8ft 6in (standard)", "3": "8ft 6in", "4": "9ft",
-    "5": "9ft 6in (high cube)", "6": ">9ft 6in", "8": "4ft 3in", "9": "9ft 6in high cube",
+    "0": "8ft",
+    "2": "8ft 6in (standard)",
+    "3": "8ft 6in",
+    "4": "9ft",
+    "5": "9ft 6in (high cube)",
+    "6": ">9ft 6in",
+    "8": "4ft 3in",
+    "9": "9ft 6in high cube",
   };
   const typeGroupMap: Record<string, string> = {
-    G: "General purpose", V: "Ventilated", B: "Bulk", R: "Integral reefer",
-    H: "Refrigerated/heated", U: "Open top", P: "Platform / flat rack",
-    T: "Tank", A: "Air/surface", F: "Folding", S: "Named cargo (livestock/auto)",
+    G: "General purpose",
+    V: "Ventilated",
+    B: "Bulk",
+    R: "Integral reefer",
+    H: "Refrigerated/heated",
+    U: "Open top",
+    P: "Platform / flat rack",
+    T: "Tank",
+    A: "Air/surface",
+    F: "Folding",
+    S: "Named cargo (livestock/auto)",
   };
   const size = sizeMap[code[0]];
   const height = heightMap[code[1]];
@@ -415,7 +540,9 @@ export function lookup(listName: string, code: string): string | null {
 
 /** Get the segment dictionary entry for a 3-letter tag. */
 export function segmentInfo(tag: string): SegmentInfo {
-  return SEGMENTS[tag] || { name: tag, brief: "Unknown segment — not in CODECO/COPRAR dictionary." };
+  return (
+    SEGMENTS[tag] || { name: tag, brief: "Unknown segment — not in CODECO/COPRAR dictionary." }
+  );
 }
 
 // ── Diagnostic engine ─────────────────────────────────────────
@@ -444,7 +571,13 @@ export function diagnoseSingle(parsed: ParsedMessage): Diagnostic[] {
   const segments = parsed.segments;
 
   if (segments.length === 0) {
-    return [{ level: "error", code: "EMPTY", message: "No segments found. Paste a CODECO or COPRAR message." }];
+    return [
+      {
+        level: "error",
+        code: "EMPTY",
+        message: "No segments found. Paste a CODECO or COPRAR message.",
+      },
+    ];
   }
 
   // 1. Bad container check digit
@@ -457,7 +590,8 @@ export function diagnoseSingle(parsed: ParsedMessage): Diagnostic[] {
           level: "error",
           code: "BAD_CHECK_DIGIT",
           message: `Container number ${num} fails ISO 6346 check-digit validation.`,
-          segmentIndex: i, tag: "EQD",
+          segmentIndex: i,
+          tag: "EQD",
         });
       }
     } else if (num) {
@@ -465,7 +599,8 @@ export function diagnoseSingle(parsed: ParsedMessage): Diagnostic[] {
         level: "warn",
         code: "BAD_BIC_FORMAT",
         message: `Equipment ID ${num} is not in valid ISO 6346 format (4 letters + 7 digits).`,
-        segmentIndex: i, tag: "EQD",
+        segmentIndex: i,
+        tag: "EQD",
       });
     }
   });
@@ -479,7 +614,8 @@ export function diagnoseSingle(parsed: ParsedMessage): Diagnostic[] {
         level: "warn",
         code: "BAD_LOCODE_FORMAT",
         message: `Location ${place} does not match the 5-character UN/LOCODE shape (2-letter country + 3-char place).`,
-        segmentIndex: i, tag: "LOC",
+        segmentIndex: i,
+        tag: "LOC",
       });
     }
   });
@@ -493,7 +629,8 @@ export function diagnoseSingle(parsed: ParsedMessage): Diagnostic[] {
         level: fmt === "204" ? "info" : "warn",
         code: "DTM_FORMAT",
         message: `DTM format ${fmt} used — SMDG mandates 203 (CCYYMMDDHHMM).`,
-        segmentIndex: i, tag: "DTM",
+        segmentIndex: i,
+        tag: "DTM",
       });
     }
   });
@@ -534,7 +671,8 @@ export function diagnoseSingle(parsed: ParsedMessage): Diagnostic[] {
         level: "error",
         code: "EMPTY_BUT_HEAVY",
         message: `EQD declared EMPTY but gross weight ${aae} kg exceeds tare ${aal ?? "?"} kg.`,
-        segmentIndex: i, tag: "EQD",
+        segmentIndex: i,
+        tag: "EQD",
       });
     }
   });
@@ -548,7 +686,8 @@ export function diagnoseSingle(parsed: ParsedMessage): Diagnostic[] {
         level: "warn",
         code: "UNKNOWN_SIZETYPE",
         message: `ISO size-type ${sz} not in standard 4-character catalogue.`,
-        segmentIndex: i, tag: "EQD",
+        segmentIndex: i,
+        tag: "EQD",
       });
     }
   });
@@ -568,7 +707,8 @@ export function diagnoseSingle(parsed: ParsedMessage): Diagnostic[] {
         level: "error",
         code: "UNT_COUNT_WRONG",
         message: `UNT declares ${declared} segments but actual count is ${actual} (UNH to UNT inclusive).`,
-        segmentIndex: untIdx, tag: "UNT",
+        segmentIndex: untIdx,
+        tag: "UNT",
       });
     }
   }
@@ -584,7 +724,8 @@ export function diagnoseSingle(parsed: ParsedMessage): Diagnostic[] {
         level: "error",
         code: "CNT_EQD_MISMATCH",
         message: `CNT+16 declares ${cv} equipment units but ${eqdCount} EQD segments are present.`,
-        segmentIndex: i, tag: "CNT",
+        segmentIndex: i,
+        tag: "CNT",
       });
     }
   });
@@ -597,14 +738,18 @@ export function diagnoseSingle(parsed: ParsedMessage): Diagnostic[] {
     let hasTmp = false;
     for (let j = i + 1; j < segments.length; j++) {
       if (segments[j].tag === "EQD") break;
-      if (segments[j].tag === "TMP") { hasTmp = true; break; }
+      if (segments[j].tag === "TMP") {
+        hasTmp = true;
+        break;
+      }
     }
     if (!hasTmp) {
       diags.push({
         level: "warn",
         code: "REEFER_WITHOUT_TMP",
         message: `Reefer container (size-type ${sz}) has no TMP setpoint segment.`,
-        segmentIndex: i, tag: "EQD",
+        segmentIndex: i,
+        tag: "EQD",
       });
     }
   });
@@ -619,8 +764,10 @@ export function diagnoseSingle(parsed: ParsedMessage): Diagnostic[] {
           diags.push({
             level: "warn",
             code: "LOAD_BUT_EMPTY",
-            message: "COPRAR Load order (BGM 45) but EQD declares EMPTY — use COPRAR Discharge or COPARN for empty repositioning.",
-            segmentIndex: i, tag: "EQD",
+            message:
+              "COPRAR Load order (BGM 45) but EQD declares EMPTY — use COPRAR Discharge or COPARN for empty repositioning.",
+            segmentIndex: i,
+            tag: "EQD",
           });
         }
       });
@@ -639,8 +786,10 @@ export function diagnoseSingle(parsed: ParsedMessage): Diagnostic[] {
           diags.push({
             level: "warn",
             code: "MISSING_VGM",
-            message: "Full container on a COPRAR Load order is missing VGM (SOLAS VI/2 §4-6, mandatory since 2016).",
-            segmentIndex: i, tag: "EQD",
+            message:
+              "Full container on a COPRAR Load order is missing VGM (SOLAS VI/2 §4-6, mandatory since 2016).",
+            segmentIndex: i,
+            tag: "EQD",
           });
         }
       });
@@ -654,7 +803,8 @@ export function diagnoseSingle(parsed: ParsedMessage): Diagnostic[] {
       diags.push({
         level: "warn",
         code: "CHARSET_LOWERCASE",
-        message: "UNB declares UNOA (uppercase only) but lowercase letters appear in the body. Likely partner-side rejection.",
+        message:
+          "UNB declares UNOA (uppercase only) but lowercase letters appear in the body. Likely partner-side rejection.",
       });
     }
   }
@@ -691,9 +841,14 @@ function buildEqdMap(parsed: ParsedMessage): Record<string, EqdRecord> {
         number: num,
         sizeType: (s.elements[2] || [])[0] || "",
         fullEmpty: (s.elements[5] || [])[0] || "",
-        pol: "", pod: "",
-        grossKgm: null, tareKgm: null, vgmKgm: null,
-        booking: "", bl: "", tempC: null,
+        pol: "",
+        pod: "",
+        grossKgm: null,
+        tareKgm: null,
+        vgmKgm: null,
+        booking: "",
+        bl: "",
+        tempC: null,
       };
       map[num] = current;
     } else if (current) {
@@ -758,10 +913,20 @@ export function reconcile(coprar: ParsedMessage, codeco: ParsedMessage): Reconci
     if (c && d) {
       const diffs: ReconcileDiff[] = [];
       if (c.sizeType && d.sizeType && c.sizeType !== d.sizeType) {
-        diffs.push({ field: "ISO size-type", coprar: c.sizeType, codeco: d.sizeType, severity: "error" });
+        diffs.push({
+          field: "ISO size-type",
+          coprar: c.sizeType,
+          codeco: d.sizeType,
+          severity: "error",
+        });
       }
       if (c.fullEmpty && d.fullEmpty && c.fullEmpty !== d.fullEmpty) {
-        diffs.push({ field: "Full/empty", coprar: c.fullEmpty, codeco: d.fullEmpty, severity: "error" });
+        diffs.push({
+          field: "Full/empty",
+          coprar: c.fullEmpty,
+          codeco: d.fullEmpty,
+          severity: "error",
+        });
       }
       if (c.pol && d.pol && c.pol !== d.pol) {
         diffs.push({ field: "POL", coprar: c.pol, codeco: d.pol, severity: "error" });
@@ -775,18 +940,33 @@ export function reconcile(coprar: ParsedMessage, codeco: ParsedMessage): Reconci
       if (c.grossKgm !== null && d.grossKgm !== null) {
         const deltaPct = (Math.abs(c.grossKgm - d.grossKgm) / Math.max(c.grossKgm, 1)) * 100;
         if (deltaPct > 2) {
-          diffs.push({ field: "Gross weight", coprar: `${c.grossKgm} kg`, codeco: `${d.grossKgm} kg`, severity: "warn" });
+          diffs.push({
+            field: "Gross weight",
+            coprar: `${c.grossKgm} kg`,
+            codeco: `${d.grossKgm} kg`,
+            severity: "warn",
+          });
         }
       }
       if (c.vgmKgm !== null && d.vgmKgm !== null) {
         const vDelta = (Math.abs(c.vgmKgm - d.vgmKgm) / Math.max(c.vgmKgm, 1)) * 100;
         if (vDelta > 5) {
-          diffs.push({ field: "VGM", coprar: `${c.vgmKgm} kg`, codeco: `${d.vgmKgm} kg`, severity: "warn" });
+          diffs.push({
+            field: "VGM",
+            coprar: `${c.vgmKgm} kg`,
+            codeco: `${d.vgmKgm} kg`,
+            severity: "warn",
+          });
         }
       }
       if (c.tempC !== null && d.tempC !== null) {
         if (Math.abs(c.tempC - d.tempC) > 1) {
-          diffs.push({ field: "Reefer temp", coprar: `${c.tempC}°C`, codeco: `${d.tempC}°C`, severity: "warn" });
+          diffs.push({
+            field: "Reefer temp",
+            coprar: `${c.tempC}°C`,
+            codeco: `${d.tempC}°C`,
+            severity: "warn",
+          });
         }
       }
       matched.push({ number: num, diffs });

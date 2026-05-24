@@ -24,12 +24,7 @@
 // See the README for the full API + diagnostic rule catalogue.
 // ============================================================
 
-export {
-  parse,
-  extractContainerNumbers,
-  extractUNLocodes,
-  DEFAULT_DELIMITERS,
-} from "./parser.js";
+export { parse, extractContainerNumbers, extractUNLocodes, DEFAULT_DELIMITERS } from "./parser.js";
 
 export {
   validateCheckDigit,

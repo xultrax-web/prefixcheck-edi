@@ -10,23 +10,23 @@ npm install @prefixcheck/edi
 import { parse, diagnoseSingle, reconcile, SAMPLE_CODECO, SAMPLE_COPRAR } from "@prefixcheck/edi";
 
 const parsed = parse(SAMPLE_CODECO);
-console.log(parsed.message?.type);        // "CODECO"
-console.log(parsed.segments.length);      // 30
+console.log(parsed.message?.type); // "CODECO"
+console.log(parsed.segments.length); // 30
 
 const diags = diagnoseSingle(parsed);
-console.log(diags);                       // [] when the message is clean
+console.log(diags); // [] when the message is clean
 
 const coprar = parse(SAMPLE_COPRAR);
 const codeco = parse(SAMPLE_CODECO);
 const report = reconcile(coprar, codeco);
-console.log(report.matched);              // [{ number: "MSCU1234566", diffs: [] }]
+console.log(report.matched); // [{ number: "MSCU1234566", diffs: [] }]
 ```
 
 ---
 
 ## Why this library exists
 
-Container-shipping EDI is a closed-world skill. The people who know CODECO and COPRAR sell consulting, not libraries. Existing open-source EDIFACT parsers tell you *what each segment is*; none of them tell you *what's wrong* with the message you have, *speak SMDG*, *validate ISO 6346 check digits*, or *reconcile a COPRAR against its matching CODECO*. That's the gap this library fills.
+Container-shipping EDI is a closed-world skill. The people who know CODECO and COPRAR sell consulting, not libraries. Existing open-source EDIFACT parsers tell you _what each segment is_; none of them tell you _what's wrong_ with the message you have, _speak SMDG_, _validate ISO 6346 check digits_, or _reconcile a COPRAR against its matching CODECO_. That's the gap this library fills.
 
 Built on:
 
@@ -57,58 +57,58 @@ Output is a `ParsedMessage` with structured `segments[]`, envelope metadata, and
 
 A 32-segment dictionary with operator-grade explanations for every common CODECO/COPRAR segment, plus 17 code-list lookups:
 
-| List | Codes | Source |
-|---|---|---|
-| `BGM.docname`, `BGM.function` | Document + function codes | UN/CEFACT 1001, 1225 |
-| `DTM.qualifier`, `DTM.format` | Date/time qualifiers + formats | UN/CEFACT 2005, 2379 |
-| `LOC.qualifier` | Place qualifiers | UN/CEFACT 3227 |
-| `EQD.type`, `EQD.supplier`, `EQD.fullEmpty` | Equipment metadata | UN/CEFACT 8053, 8077, 8169 |
-| `STS.code` | Status codes + SMDG attributes | UN/CEFACT 9015 + SMDG JM4/170 |
-| `RFF.qualifier` | Reference qualifiers | UN/CEFACT 1153 |
-| `NAD.party` | Party qualifiers | UN/CEFACT 3035 |
-| `MEA.qualifier`, `MEA.unit` | Measurement + units | UN/CEFACT 6313, 6411 |
-| `VGM.method` | SOLAS VGM method codes | SMDG 2.1.3 ST VGM |
-| `HAN.code` | Handling instruction codes | UN/CEFACT 4079 + SMDG JM4/121 |
-| `SEL.party` | Seal-applying party | UN/CEFACT 9303 |
-| `FTX.qualifier` | Free text qualifiers | UN/CEFACT 4451 |
-| `TDT.mode`, `TDT.idCodeList` | Transport mode + ID code lists | UN/CEFACT 8067, 1131 |
-| `CNT.qualifier` | Control total qualifiers | UN/CEFACT 6069 |
-| `UNB.syntax` | Syntax level codes | UN/CEFACT 0001 |
+| List                                        | Codes                          | Source                        |
+| ------------------------------------------- | ------------------------------ | ----------------------------- |
+| `BGM.docname`, `BGM.function`               | Document + function codes      | UN/CEFACT 1001, 1225          |
+| `DTM.qualifier`, `DTM.format`               | Date/time qualifiers + formats | UN/CEFACT 2005, 2379          |
+| `LOC.qualifier`                             | Place qualifiers               | UN/CEFACT 3227                |
+| `EQD.type`, `EQD.supplier`, `EQD.fullEmpty` | Equipment metadata             | UN/CEFACT 8053, 8077, 8169    |
+| `STS.code`                                  | Status codes + SMDG attributes | UN/CEFACT 9015 + SMDG JM4/170 |
+| `RFF.qualifier`                             | Reference qualifiers           | UN/CEFACT 1153                |
+| `NAD.party`                                 | Party qualifiers               | UN/CEFACT 3035                |
+| `MEA.qualifier`, `MEA.unit`                 | Measurement + units            | UN/CEFACT 6313, 6411          |
+| `VGM.method`                                | SOLAS VGM method codes         | SMDG 2.1.3 ST VGM             |
+| `HAN.code`                                  | Handling instruction codes     | UN/CEFACT 4079 + SMDG JM4/121 |
+| `SEL.party`                                 | Seal-applying party            | UN/CEFACT 9303                |
+| `FTX.qualifier`                             | Free text qualifiers           | UN/CEFACT 4451                |
+| `TDT.mode`, `TDT.idCodeList`                | Transport mode + ID code lists | UN/CEFACT 8067, 1131          |
+| `CNT.qualifier`                             | Control total qualifiers       | UN/CEFACT 6069                |
+| `UNB.syntax`                                | Syntax level codes             | UN/CEFACT 0001                |
 
 ### Diagnostics (`diagnoseSingle`)
 
 Eleven validation rules implementing the operator-grade checks that paid EDI consultants run:
 
-| Code | Level | Catches |
-|---|---|---|
-| `BAD_CHECK_DIGIT` | error | Container number fails ISO 6346 mod-11 |
-| `BAD_BIC_FORMAT` | warn | Equipment ID not in 4-letter + 7-digit shape |
-| `BAD_LOCODE_FORMAT` | warn | LOC place doesn't match UN/LOCODE pattern |
-| `DTM_FORMAT` | warn / info | Date format not SMDG-mandated 203 |
-| `MISSING_NAD_CF` | error | No container operator party (SMDG requires it) |
-| `EMPTY_BUT_HEAVY` | error | EQD declared empty but gross weight exceeds tare |
-| `UNKNOWN_SIZETYPE` | warn | ISO 4-char size-type not in catalogue |
-| `UNT_COUNT_WRONG` | error | UNT count ≠ actual UNH→UNT inclusive count |
-| `CNT_EQD_MISMATCH` | error | CNT+16 disagrees with EQD count |
-| `REEFER_WITHOUT_TMP` | warn | R-type ISO size but no TMP setpoint |
-| `LOAD_BUT_EMPTY` | warn | COPRAR Load order but EQD declares empty |
-| `MISSING_VGM` | warn | Full container on Load order missing SOLAS VGM |
-| `CHARSET_LOWERCASE` | warn | UNB declares UNOA but body contains lowercase |
+| Code                 | Level       | Catches                                          |
+| -------------------- | ----------- | ------------------------------------------------ |
+| `BAD_CHECK_DIGIT`    | error       | Container number fails ISO 6346 mod-11           |
+| `BAD_BIC_FORMAT`     | warn        | Equipment ID not in 4-letter + 7-digit shape     |
+| `BAD_LOCODE_FORMAT`  | warn        | LOC place doesn't match UN/LOCODE pattern        |
+| `DTM_FORMAT`         | warn / info | Date format not SMDG-mandated 203                |
+| `MISSING_NAD_CF`     | error       | No container operator party (SMDG requires it)   |
+| `EMPTY_BUT_HEAVY`    | error       | EQD declared empty but gross weight exceeds tare |
+| `UNKNOWN_SIZETYPE`   | warn        | ISO 4-char size-type not in catalogue            |
+| `UNT_COUNT_WRONG`    | error       | UNT count ≠ actual UNH→UNT inclusive count       |
+| `CNT_EQD_MISMATCH`   | error       | CNT+16 disagrees with EQD count                  |
+| `REEFER_WITHOUT_TMP` | warn        | R-type ISO size but no TMP setpoint              |
+| `LOAD_BUT_EMPTY`     | warn        | COPRAR Load order but EQD declares empty         |
+| `MISSING_VGM`        | warn        | Full container on Load order missing SOLAS VGM   |
+| `CHARSET_LOWERCASE`  | warn        | UNB declares UNOA but body contains lowercase    |
 
 ### Reconcile (`reconcile`)
 
 Cross-message matching for a COPRAR + its matching CODECO. For every shared container number, compares the relevant operator-level fields and surfaces diffs at the right severity:
 
-| Field | Tolerance | Severity |
-|---|---|---|
-| ISO size-type | exact match | error |
-| Full/empty | exact match | error |
-| POL | exact match | error |
-| POD | exact match | error |
-| Booking ref | exact match | warn |
-| Gross weight | ±2% | warn |
-| VGM | ±5% | warn |
-| Reefer temperature | ±1°C | warn |
+| Field              | Tolerance   | Severity |
+| ------------------ | ----------- | -------- |
+| ISO size-type      | exact match | error    |
+| Full/empty         | exact match | error    |
+| POL                | exact match | error    |
+| POD                | exact match | error    |
+| Booking ref        | exact match | warn     |
+| Gross weight       | ±2%         | warn     |
+| VGM                | ±5%         | warn     |
+| Reefer temperature | ±1°C        | warn     |
 
 Also returns:
 

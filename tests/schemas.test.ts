@@ -130,10 +130,7 @@ describe("diagnoseSingle", () => {
   });
 
   it("fires DTM_FORMAT when SMDG-mandated 203 isn't used", () => {
-    const broken = SAMPLE_CODECO.replace(
-      "DTM+137:202605241430:203'",
-      "DTM+137:20260524:102'",
-    );
+    const broken = SAMPLE_CODECO.replace("DTM+137:202605241430:203'", "DTM+137:20260524:102'");
     const r = parse(broken);
     const diags = diagnoseSingle(r);
     expect(diags.some((d) => d.code === "DTM_FORMAT")).toBe(true);
